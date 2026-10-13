@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RBT Pirate Treasure Hunt 3D</title>
+<style>
+:root{--navy:#123047;--sea:#0b8da5;--aqua:#baf4ee;--gold:#ffd166;--cream:#fff8e8;--ink:#152b35;--red:#d94f45;--green:#16845b}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+body{background:linear-gradient(180deg,#73d9e5 0%,#c7f6ee 48%,#f8df9c 100%);overflow-x:hidden}
+button,input,select{font:inherit}button{cursor:pointer;touch-action:manipulation}
+.app{max-width:1050px;margin:auto;padding:14px;min-height:100vh}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.brand{font-weight:1000;letter-spacing:.3px;color:#10374c;text-shadow:0 2px #fff;font-size:clamp(16px,3vw,22px)}
+.pill{background:#fff9;border:2px solid #fff;padding:8px 12px;border-radius:999px;font-weight:800}
+.panel{background:#fffaf0;border:3px solid #fff;border-radius:24px;padding:clamp(16px,3vw,28px);box-shadow:0 9px 0 #13536b25,0 18px 35px #10405220}
+.screen{display:none}.screen.active{display:block;animation:appear .35s ease}
+@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hero{text-align:center;position:relative;overflow:hidden;background:linear-gradient(160deg,#e7fffa,#fff4cf)}
+.hero h1{font-size:clamp(28px,6vw,54px);line-height:1.04;margin:8px auto 12px;color:#103b52;text-shadow:2px 3px #ffd166;max-width:850px}
+.hero p{max-width:690px;margin:10px auto 18px;font-size:clamp(15px,2.5vw,18px);line-height:1.5}
+.scene{height:190px;position:relative;margin:5px auto 10px;max-width:760px;border-radius:20px;overflow:hidden;background:linear-gradient(#85e0ef 0 48%,#159cb7 48% 100%)}
+.sun{position:absolute;right:12%;top:16px;width:50px;height:50px;border-radius:50%;background:#ffe18a;box-shadow:0 0 0 12px #ffe18a55}
+.cloud{position:absolute;top:25px;font-size:35px;animation:drift 10s linear infinite}
+@keyframes drift{0%{transform:translateX(-90px)}100%{transform:translateX(850px)}}
+.island{position:absolute;right:8%;bottom:58px;font-size:74px;filter:drop-shadow(0 5px #0002)}
+.ship{position:absolute;left:10%;bottom:23px;font-size:76px;animation:float 2.8s ease-in-out infinite;filter:drop-shadow(0 6px #08384c55)}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+.wave{position:absolute;bottom:0;left:0;width:200%;font-size:35px;white-space:nowrap;opacity:.8;animation:wave 18s linear infinite}
+@keyframes wave{to{transform:translateX(-50%)}}
+.btnrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:15px}
+.btn{border:0;border-radius:15px;padding:13px 18px;min-height:48px;font-weight:900;box-shadow:0 4px 0 #102b3c2b;transition:transform .12s,filter .12s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #102b3c2b}
+.primary{background:var(--gold);color:#302b17}.secondary{background:#d4f6ef;color:#123d4a}.dark{background:#173d51;color:white}.danger{background:#f7c7bd;color:#6d211c}.small{padding:8px 12px;min-height:38px;font-size:14px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+label{display:block;font-weight:850;margin-bottom:6px}
+input,select{width:100%;min-height:48px;padding:12px;border:2px solid #bad8d5;border-radius:12px;background:white;color:#172f38}
+input:focus,select:focus,button:focus-visible{outline:3px solid #e9ad31;outline-offset:2px}
+.hint{font-size:13px;color:#52666a}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.rule{background:#e5f8f2;border-radius:14px;padding:12px;text-align:center;font-weight:800}
+.gamehead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat{background:#e4f7f3;padding:9px 12px;border-radius:12px;font-weight:900}
+.levelbar{height:10px;background:#d4e7df;border-radius:999px;overflow:hidden;margin:12px 0 18px}
+.levelbar>div{height:100%;width:0;background:linear-gradient(90deg,#0d9b9b,#ffd166);transition:width .4s}
+.islandhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.islandicon{font-size:45px;background:#d9f8ed;border-radius:16px;padding:5px 12px}
+.leveltitle{font-size:13px;text-transform:uppercase;letter-spacing:1px;font-weight:900;color:#467078}
+.question{font-size:clamp(20px,4vw,29px);line-height:1.25;margin:12px 0 18px;font-weight:950}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.option{display:flex;text-align:left;align-items:center;gap:10px;border:2px solid #b8d8d4;border-radius:15px;padding:14px;background:#fff;min-height:64px;font-weight:800;color:#173743}
+.option .letter{display:grid;place-items:center;flex:0 0 34px;height:34px;border-radius:10px;background:#dff7f1;font-weight:1000}
+.option:disabled{cursor:default;opacity:1}
+.option.correct{border-color:#159567;background:#d9f7e8}.option.correct .letter{background:#159567;color:white}
+.option.wrong{border-color:#d94f45;background:#ffe5df}.option.wrong .letter{background:#d94f45;color:white}
+.feedback{display:none;margin-top:15px;padding:14px;border-radius:15px;font-weight:750;line-height:1.45}
+.feedback.show{display:block}.feedback.good{background:#d9f7e8;border:2px solid #8cd9b2}.feedback.bad{background:#ffe4df;border:2px solid #f0aaa0}
+.feedback strong{display:block;font-size:18px;margin-bottom:4px}
+.maprow{display:flex;gap:6px;margin:10px 0 16px}.mapdot{flex:1;text-align:center;border-radius:10px;background:#e6e7db;padding:8px 2px;font-size:12px;font-weight:900}.mapdot.done{background:#ffe29a}.mapdot.current{background:#1a7181;color:white}
+.result{text-align:center}.treasure{font-size:82px;animation:bounce 1.5s infinite}@keyframes bounce{50%{transform:translateY(-8px) rotate(4deg)}}
+.scorebig{font-size:clamp(38px,8vw,68px);font-weight:1000;color:#13566b}
+.resultgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:16px 0}
+.resultbox{background:#e5f8f2;padding:12px;border-radius:14px;font-weight:850}.resultbox b{display:block;font-size:24px}
+.tablewrap{overflow:auto;margin-top:15px}table{width:100%;border-collapse:collapse;min-width:700px;background:white;border-radius:12px;overflow:hidden}th,td{text-align:left;padding:10px;border-bottom:1px solid #e0e8e5}th{background:#d9f4ed}td{font-size:14px}
+.notice{padding:12px;border-radius:12px;background:#fff1c9;line-height:1.45;margin:12px 0;font-size:14px}
+.hidden{display:none!important}.footer{text-align:center;font-size:12px;color:#315966;padding:16px}
+@media(max-width:600px){.app{padding:9px}.formgrid,.options{grid-template-columns:1fr}.rules{grid-template-columns:1fr}.scene{height:160px}.ship{font-size:60px}.island{font-size:60px}.panel{border-radius:19px;padding:15px}.resultgrid{grid-template-columns:1fr 1fr}.resultbox:last-child{grid-column:1/-1}.mapdot{font-size:10px;padding:7px 1px}}
+@media print{body{background:white}.topbar,.no-print,#home,#entry,#game,#result{display:none!important}#teacher{display:block!important}.panel{box-shadow:none;border:0}.app{max-width:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">🏴‍☠️ RBT PIRATE TREASURE HUNT 3D</div>
+    <div class="pill">🪙 THE LOST FOOD TREASURE</div>
+  </div>
+
+  <section id="home" class="screen active">
+    <div class="panel hero">
+      <div class="scene" aria-label="Kapal lanun belayar menuju pulau harta karun">
+        <div class="sun"></div><div class="cloud">☁️</div><div class="island">🌴🏝️</div><div class="ship">🏴‍☠️⛵</div><div class="wave">🌊　🌊　🌊　🌊　🌊　🌊　🌊　🌊　🌊　🌊　🌊　🌊　</div>
+      </div>
+      <h1>THE LOST<br>FOOD TREASURE</h1>
+      <p>Ahoy, kapten! Terokai <b>3 pulau misteri</b>, jawab 10 soalan RBT dan kumpulkan syiling emas untuk menemui harta karun ilmu!</p>
+      <div class="rules">
+        <div class="rule">❤️ 5 NYAWA</div><div class="rule">🪙 +10 MARKAH</div><div class="rule">🗺️ 3 LEVEL</div>
+      </div>
+      <div class="btnrow">
+        <button class="btn primary" id="startBtn">⚓ MULA PENGEMBARAAN</button>
+        <button class="btn secondary" id="howBtn">📜 CARA BERMAIN</button>
+        <button class="btn dark" id="musicBtn" aria-pressed="false">🔊 MUZIK: OFF</button>
+        <button class="btn secondary" id="teacherOpen">🧭 DASHBOARD GURU</button>
+      </div>
+      <p class="hint">Kredit pembangunan: GURU RBT</p>
+    </div>
+  </section>
+
+  <section id="entry" class="screen">
+    <div class="panel">
+      <h2>🧭 Daftar Kapten</h2>
+      <p>Masukkan nama dan kelas sebelum belayar.</p>
+      <form id="studentForm">
+        <div class="formgrid">
+          <div><label for="studentName">Nama penuh murid</label><input id="studentName" autocomplete="name" maxlength="100" placeholder="Contoh: Aisyah binti Ali" required></div>
+          <div><label for="studentClass">Kelas</label><input id="studentClass" maxlength="40" placeholder="Contoh: 2 Alpha" required></div>
+        </div>
+        <div class="notice">📌 Jawab setiap soalan sekali sahaja. Jawapan betul mendapat 10 markah. Jawapan salah mengurangkan 1 nyawa.</div>
+        <div class="btnrow"><button type="submit" class="btn primary">🚢 BELAYAR SEKARANG</button><button type="button" class="btn secondary" data-goto="home">KEMBALI</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="game" class="screen">
+    <div class="panel">
+      <div class="gamehead">
+        <div><div class="leveltitle" id="levelKicker">LEVEL 1</div><h2 id="islandName" style="margin:2px 0">Pulau Asas Reka Bentuk</h2></div>
+        <div class="stats"><div class="stat">🪙 Skor: <span id="score">0</span></div><div class="stat">❤️ Nyawa: <span id="lives">❤️❤️❤️❤️❤️</span></div><div class="stat">🧩 <span id="progress">0/10</span></div></div>
+      </div>
+      <div class="levelbar"><div id="progressBar"></div></div>
+      <div class="maprow" id="maprow"><div class="mapdot current">🏝️ LEVEL 1</div><div class="mapdot">🌳 LEVEL 2</div><div class="mapdot">🍳 LEVEL 3</div></div>
+      <div class="islandhead"><div class="islandicon" id="islandIcon">🏝️</div><div><div class="leveltitle">MISI <span id="questionNumber">1</span> DARIPADA 10</div><div class="hint">Pilih satu jawapan yang paling tepat.</div></div></div>
+      <div id="questionText" class="question"></div>
+      <div id="options" class="options"></div>
+      <div id="feedback" class="feedback" role="status" aria-live="polite"></div>
+      <div class="btnrow"><button id="nextBtn" class="btn primary hidden">SOALAN SETERUSNYA ➜</button><button id="quitBtn" class="btn secondary">🏳️ Tamatkan percubaan</button></div>
+    </div>
+  </section>
+
+  <section id="result" class="screen">
+    <div class="panel result">
+      <div class="treasure" id="treasureIcon">🎁</div><h1 id="resultTitle">Misi selesai!</h1>
+      <div class="scorebig"><span id="finalScore">0</span><span style="font-size:22px"> / 100</span></div>
+      <h2 id="rankTitle">PEMULA PENGEMBARAAN</h2>
+      <p id="encourage"></p>
+      <div class="resultgrid">
+        <div class="resultbox">✅ Betul<b id="finalCorrect">0</b></div>
+        <div class="resultbox">❌ Salah<b id="finalWrong">0</b></div>
+        <div class="resultbox">❤️ Nyawa tinggal<b id="finalLives">5</b></div>
+      </div>
+      <p id="studentSummary"></p><p class="hint" id="dateSummary"></p>
+      <div class="btnrow"><button id="replayBtn" class="btn primary">🔁 MAIN SEMULA</button><button id="homeBtn" class="btn secondary">🏠 MENU UTAMA</button></div>
+    </div>
+  </section>
+
+  <section id="teacher" class="screen">
+    <div class="panel">
+      <div class="gamehead"><div><div class="leveltitle">RUANG GURU</div><h2 style="margin:3px 0">📊 Dashboard Guru</h2></div><button class="btn secondary small" id="teacherBack">KEMBALI KE MENU</button></div>
+      <div id="pinArea">
+        <p>Masukkan PIN guru untuk melihat dan mengurus rekod pada peranti ini.</p>
+        <form id="pinForm"><div class="formgrid"><div><label for="teacherPin">PIN guru</label><input id="teacherPin" type="password" inputmode="numeric" placeholder="Masukkan PIN" required></div></div><button class="btn primary" type="submit">BUKA DASHBOARD</button></form>
+        <p class="hint">PIN lalai: <b>2468</b>. Ubah nilai TEACHER_PIN dalam kod HTML sebelum dikongsi.</p>
+      </div>
+      <div id="dashboardData" class="hidden">
+        <div class="notice">⚠️ Rekod ini disimpan dalam localStorage pada pelayar/peranti ini sahaja. Rekod daripada telefon murid lain tidak akan muncul secara automatik. Integrasi Google Sheets memerlukan backend yang dikonfigurasi.</div>
+        <div class="rules"><div class="rule">👩‍🎓 Jumlah percubaan<br><span id="totalRecords">0</span></div><div class="rule">📈 Purata skor<br><span id="avgScore">0</span></div><div class="rule">🏆 Skor tertinggi<br><span id="bestScore">0</span></div></div>
+        <div class="formgrid">
+          <div><label for="searchName">Cari nama murid</label><input id="searchName" placeholder="Taip nama..."></div>
+          <div><label for="filterClass">Tapis kelas</label><select id="filterClass"><option value="">Semua kelas</option></select></div>
+        </div>
+        <div class="btnrow" style="justify-content:flex-start">
+          <button id="sortBtn" class="btn secondary small">Susun skor: tertinggi dahulu</button>
+          <button id="csvBtn" class="btn primary small">⬇ MUAT TURUN CSV</button>
+          <button id="printBtn" class="btn secondary small">🖨 CETAK LAPORAN / PDF</button>
+          <button id="deleteBtn" class="btn danger small">🗑 PADAM SEMUA REKOD</button>
+          <button id="changePinBtn" class="btn secondary small">🔐 TUKAR PIN</button>
+          <button id="logoutBtn" class="btn dark small">KUNCI DASHBOARD</button>
+        </div>
+        <p id="recordCount" class="hint"></p>
+        <div class="tablewrap"><table><thead><tr><th>Nama</th><th>Kelas</th><th>Skor</th><th>Betul</th><th>Salah</th><th>Nyawa</th><th>Status</th><th>Tarikh & masa</th></tr></thead><tbody id="recordsBody"></tbody></table></div>
+      </div>
+    </div>
+  </section>
+  <div class="footer">RBT Tingkatan 2 · Reka Bentuk Makanan · Permainan pembelajaran untuk PdPR</div>
+</div>
+<script>
+'use strict';
+const TEACHER_PIN = '2468'; // Ubah PIN ini sebelum berkongsi fail.
+const STORAGE_KEY = 'rbtPirateTreasureRecords_v1';
+const questions = [
+ {q:'Apakah maksud reka bentuk makanan?',o:['Aktiviti memasak makanan sahaja.','Aktiviti menghasilkan bentuk makanan yang melibatkan inovasi dan kreativiti.','Aktiviti mencuci pinggan.','Aktiviti menyimpan makanan di dalam peti sejuk.'],a:1,e:'Reka bentuk makanan melibatkan inovasi dan kreativiti untuk menghasilkan makanan yang menarik.'},
+ {q:'Antara berikut, yang manakah contoh susunan hiasan pada pinggan?',o:['Mengukir buah menjadi bentuk bunga.','Membentuk roti menjadi haiwan.','Menyusun makanan di atas pinggan supaya kelihatan menarik.','Memotong kayu untuk membuat meja.'],a:2,e:'Susunan makanan di atas pinggan ialah cara menghias dan mempersembahkan makanan supaya menarik.'},
+ {q:'Mengapakah reka bentuk makanan penting dalam perniagaan?',o:['Menambahkan berat pinggan.','Membuka peluang perniagaan dan menambah pendapatan.','Menyebabkan makanan cepat rosak.','Mengurangkan kreativiti.'],a:1,e:'Reka bentuk makanan yang menarik boleh membuka peluang perniagaan dan menambah pendapatan.'},
+ {q:'Elemen manakah yang memberikan kesan visual seperti merah, hijau dan kuning pada makanan?',o:['Warna.','Ruang.','Saiz.','Garisan.'],a:0,e:'Warna seperti merah, hijau dan kuning membantu menjadikan makanan lebih menarik.'},
+ {q:'Apakah maksud tekstur makanan?',o:['Harga makanan.','Kesan atau keadaan permukaan makanan seperti lembut, rangup dan kasar.','Berat pinggan.','Nama pengusaha makanan.'],a:1,e:'Tekstur menerangkan keadaan permukaan atau rasa sentuhan makanan, contohnya lembut dan rangup.'},
+ {q:'Susunan makanan yang mempunyai perbezaan warna yang ketara menunjukkan prinsip:',o:['Pengulangan.','Kesatuan.','Kontras.','Keringkasan.'],a:2,e:'Kontras ialah perbezaan yang ketara, contohnya warna makanan yang berbeza.'},
+ {q:'Apakah maksud keseimbangan dalam susunan makanan?',o:['Semua makanan diletakkan pada satu bahagian pinggan sahaja.','Susunan makanan mempunyai agihan visual yang seimbang.','Semua makanan mesti mempunyai warna yang sama.','Pinggan mesti terlalu penuh.'],a:1,e:'Keseimbangan bermaksud susunan makanan mempunyai agihan visual yang seimbang.'},
+ {q:'Pisau yang sesuai untuk memotong roti yang mempunyai kulit lebih keras ialah:',o:['Pisau bergerigi.','Pisau pengupas.','Pisau bulan sabit.','Pisau penyisih.'],a:0,e:'Pisau bergerigi sesuai untuk memotong roti kerana giginya membantu memotong kulit roti.'},
+ {q:'Mengapakah saiz hidangan perlu sesuai dengan saiz pinggan?',o:['Supaya pinggan kelihatan lebih berat.','Supaya susunan makanan kelihatan seimbang dan menarik.','Supaya makanan tidak mempunyai rasa.','Supaya pinggan mudah pecah.'],a:1,e:'Saiz hidangan yang sesuai membantu susunan makanan kelihatan seimbang dan menarik.'},
+ {q:'Antara berikut, yang manakah ciri pembungkusan makanan yang baik?',o:['Sukar dibawa.','Tidak selamat digunakan.','Ergonomik, mesra alam dan selamat digunakan.','Tidak mempunyai sebarang maklumat produk.'],a:2,e:'Pembungkusan yang baik sepatutnya ergonomik, mesra alam dan selamat digunakan.'}
+];
+const levels=[
+ {name:'Pulau Asas Reka Bentuk',icon:'🏝️',kicker:'LEVEL 1 · PULAU ASAS REKA BENTUK',start:0,end:3},
+ {name:'Pulau Seni Makanan',icon:'🌳',kicker:'LEVEL 2 · PULAU SENI MAKANAN',start:3,end:7},
+ {name:'Pulau Dapur Lanun',icon:'🍳',kicker:'LEVEL 3 · PULAU DAPUR LANUN',start:7,end:10}
+];
+let student={name:'',klass:''},index=0,score=0,lives=5,correct=0,wrong=0,answered=false,attemptStart=null,sortDescending=true,audioCtx=null,musicOn=false,musicTimer=null;
+const $=id=>document.getElementById(id);
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+function getRecords(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(e){return []}}
+function saveRecord(record){try{const records=getRecords();records.unshift(record);localStorage.setItem(STORAGE_KEY,JSON.stringify(records));return true}catch(e){alert('Rekod tidak dapat disimpan. Semak ruang storan pelayar.');return false}}
+function audio(){if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();return audioCtx}
+function tone(freq=440,duration=.12,type='sine',volume=.045,delay=0){if(!musicOn && type==='music')return;try{const c=audio(),o=c.createOscillator(),g=c.createGain();o.type=type==='music'?'triangle':type;o.frequency.value=freq;g.gain.setValueAtTime(volume,c.currentTime+delay);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+delay+duration);o.connect(g);g.connect(c.destination);o.start(c.currentTime+delay);o.stop(c.currentTime+delay+duration)}catch(e){}}
+function sfx(kind){if(!musicOn)return;if(kind==='good'){[660,880,1100].forEach((f,i)=>tone(f,.14,'sine',.07,i*.08))}else if(kind==='bad'){tone(190,.22,'triangle',.06);tone(140,.25,'triangle',.05,.15)}else if(kind==='chest'){[330,440,550,660].forEach((f,i)=>tone(f,.22,'sine',.06,i*.09))}else if(kind==='click'){tone(500,.05,'sine',.025)}else if(kind==='win'){[523,659,784,1047].forEach((f,i)=>tone(f,.35,'sine',.07,i*.16))}}
+function startMusic(){if(musicTimer)clearInterval(musicTimer);if(!musicOn)return;let n=0;const notes=[262,330,392,330,294,349,440,349];musicTimer=setInterval(()=>{if(musicOn){tone(notes[n%notes.length],.3,'music',.018);n++}},390)}
+function toggleMusic(){musicOn=!musicOn;$('musicBtn').textContent=musicOn?'🔊 MUZIK: ON':'🔇 MUZIK: OFF';$('musicBtn').setAttribute('aria-pressed',String(musicOn));if(musicOn){audio();startMusic();tone(520,.08,'sine',.03)}else{if(musicTimer)clearInterval(musicTimer)}}
+$('musicBtn').addEventListener('click',toggleMusic);
+$('howBtn').addEventListener('click',()=>{alert('CARA BERMAIN\\n1. Isi nama penuh dan kelas.\\n2. Jawab 10 soalan pilihan A, B, C atau D.\\n3. Jawapan betul = +10 markah.\\n4. Jawapan salah = hilang 1 nyawa.\\n5. Mula dengan 5 nyawa.\\n6. Selesaikan 3 pulau dan kumpulkan harta karun!');sfx('click')});
+$('startBtn').addEventListener('click',()=>{showScreen('entry');$('studentName').focus()});
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>showScreen(b.dataset.goto)));
+$('studentForm').addEventListener('submit',e=>{e.preventDefault();student.name=$('studentName').value.trim();student.klass=$('studentClass').value.trim();if(!student.name||!student.klass){alert('Sila isi nama penuh dan kelas.');return}index=0;score=0;lives=5;correct=0;wrong=0;attemptStart=new Date();showScreen('game');if(musicOn){audio();startMusic()}renderQuestion();});
+function currentLevel(){return levels.findIndex(l=>index>=l.start&&index<l.end)}
+function renderQuestion(){
+ answered=false;const q=questions[index],li=currentLevel(),lev=levels[li];
+ $('levelKicker').textContent=lev.kicker;$('islandName').textContent=lev.name;$('islandIcon').textContent=lev.icon;$('questionNumber').textContent=index+1;
+ $('score').textContent=score;$('lives').textContent='❤️'.repeat(lives)+'🤍'.repeat(5-lives);$('progress').textContent=index+'/10';$('progressBar').style.width=(index/10*100)+'%';
+ $('maprow').innerHTML=levels.map((l,i)=>`<div class="mapdot ${i<li?'done':i===li?'current':''}">${i<li?'✅':l.icon} LEVEL ${i+1}</div>`).join('');
+ $('questionText').textContent=q.q;$('options').innerHTML='';
+ q.o.forEach((opt,i)=>{const b=document.createElement('button');b.className='option';b.innerHTML=`<span class="letter">${'ABCD'[i]}</span><span></span>`;b.lastElementChild.textContent=opt;b.addEventListener('click',()=>answer(i));$('options').appendChild(b)});
+ $('feedback').className='feedback';$('feedback').textContent='';$('nextBtn').classList.add('hidden');$('progressBar').style.width=(index/10*100)+'%';
+}
+function answer(choice){
+ if(answered)return;answered=true;const q=questions[index],buttons=[...$('options').querySelectorAll('button')],isCorrect=choice===q.a;
+ buttons.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add('correct');if(i===choice&&!isCorrect)b.classList.add('wrong')});
+ if(isCorrect){score+=10;correct++;sfx('good')}else{lives--;wrong++;sfx('bad')}
+ $('score').textContent=score;$('lives').textContent='❤️'.repeat(lives)+'🤍'.repeat(5-lives);
+ const fb=$('feedback');fb.className='feedback show '+(isCorrect?'good':'bad');fb.innerHTML=`<strong>${isCorrect?'✨ HEBAT, KAPTEN! Anda menemui syiling emas!':'💨 OOPS! Cuba ingat semula nota RBT anda!'}</strong><span>${escapeHtml(q.e)}</span>${!isCorrect?`<br><b>Jawapan yang betul: ${'ABCD'[q.a]}. ${escapeHtml(q.o[q.a])}</b>`:''}`;
+ $('progress').textContent=(index+1)+'/10';$('progressBar').style.width=((index+1)/10*100)+'%';$('nextBtn').classList.remove('hidden');$('nextBtn').textContent=index===9?'BUKA PETI HARTA KARUN 🏆':'SOALAN SETERUSNYA ➜';
+ if(lives<=0){$('nextBtn').textContent='LIHAT KEPUTUSAN';}
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('nextBtn').addEventListener('click',()=>{
+ if(!answered)return;sfx('click');
+ if(lives<=0||index===9){finishGame(lives>0&&index===9);return}
+ index++;if(index===3||index===7){sfx('chest');alert('🎉 LEVEL BAHARU DIBUKA!\\n'+levels[currentLevel()].name+'\\nTeruskan, kapten!')}renderQuestion();
+});
+$('quitBtn').addEventListener('click',()=>{if(confirm('Tamatkan percubaan sekarang? Skor semasa akan direkodkan.'))finishGame(false)});
+function finishGame(completed){
+ const now=new Date(),status=completed?'TAMAT BERJAYA':'NYAWA HABIS / PERMUKAAN DITAMATKAN';
+ const rank=score>=80?'KAPTEN PAKAR RBT':score>=60?'PEMBURU HARTA KARUN HEBAT':score>=40?'PELAUT YANG SEDANG BELAJAR':'PEMULA PENGEMBARAAN';
+ const record={name:student.name,klass:student.klass,score,correct,wrong,lives,status,completedAt:now.toISOString(),startedAt:(attemptStart||now).toISOString()};
+ saveRecord(record);$('treasureIcon').textContent=completed?'🏆':'🧭';$('resultTitle').textContent=completed?'TAHNIAH, KAPTEN!':'PENGEMBARAAN TAMAT';$('finalScore').textContent=score;$('rankTitle').textContent=rank;$('finalCorrect').textContent=correct;$('finalWrong').textContent=wrong;$('finalLives').textContent=lives;
+ $('encourage').textContent=completed?'Anda berjaya menamatkan semua misi dan menemui harta karun ilmu!':lives===0?'Nyawa anda telah habis. Baca semula nota dan cuba lagi!':'Percubaan anda telah direkodkan. Teruskan belajar dan cuba lagi untuk skor lebih tinggi.';
+ $('studentSummary').textContent=`Kapten: ${student.name} · Kelas: ${student.klass} · Status: ${status}`;$('dateSummary').textContent='Tarikh dan masa: '+now.toLocaleString('ms-MY');showScreen('result');if(completed)sfx('win');
+}
+$('replayBtn').addEventListener('click',()=>{showScreen('entry');$('studentName').value=student.name;$('studentClass').value=student.klass});
+$('homeBtn').addEventListener('click',()=>showScreen('home'));
+$('teacherOpen').addEventListener('click',()=>{showScreen('teacher');$('pinArea').classList.remove('hidden');$('dashboardData').classList.add('hidden');$('teacherPin').value='';});
+$('teacherBack').addEventListener('click',()=>showScreen('home'));
+$('pinForm').addEventListener('submit',e=>{e.preventDefault();if($('teacherPin').value===TEACHER_PIN){$('pinArea').classList.add('hidden');$('dashboardData').classList.remove('hidden');renderDashboard()}else{alert('PIN tidak betul. Cuba lagi.');$('teacherPin').select()}});
+$('logoutBtn').addEventListener('click',()=>{$('dashboardData').classList.add('hidden');$('pinArea').classList.remove('hidden');$('teacherPin').value=''});
+$('searchName').addEventListener('input',renderTable);$('filterClass').addEventListener('change',renderTable);
+$('sortBtn').addEventListener('click',()=>{sortDescending=!sortDescending;$('sortBtn').textContent=sortDescending?'Susun skor: tertinggi dahulu':'Susun skor: terendah dahulu';renderTable()});
+function renderDashboard(){const r=getRecords();$('totalRecords').textContent=r.length;$('avgScore').textContent=r.length?Math.round(r.reduce((a,x)=>a+x.score,0)/r.length):0;$('bestScore').textContent=r.length?Math.max(...r.map(x=>x.score)):0;
+ const classes=[...new Set(r.map(x=>x.klass).filter(Boolean))].sort();const sel=$('filterClass'),old=sel.value;sel.innerHTML='<option value="">Semua kelas</option>'+classes.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');sel.value=classes.includes(old)?old:'';renderTable()}
+function filteredRecords(){let r=getRecords(),name=$('searchName').value.trim().toLowerCase(),klass=$('filterClass').value;r=r.filter(x=>(!name||x.name.toLowerCase().includes(name))&&(!klass||x.klass===klass));r.sort((a,b)=>sortDescending?b.score-a.score:a.score-b.score);return r}
+function renderTable(){const r=filteredRecords();$('recordCount').textContent=`Memaparkan ${r.length} rekod. Jumlah rekod setempat: ${getRecords().length}.`;$('recordsBody').innerHTML='';if(!r.length){$('recordsBody').innerHTML='<tr><td colspan="8">Tiada rekod ditemui pada peranti ini.</td></tr>';return}r.forEach(x=>{const tr=document.createElement('tr');[x.name,x.klass,x.score,x.correct,x.wrong,x.lives,x.status,new Date(x.completedAt).toLocaleString('ms-MY')].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});$('recordsBody').appendChild(tr)})}
+$('csvBtn').addEventListener('click',()=>{const rows=[['Nama','Kelas','Skor','Betul','Salah','Nyawa tinggal','Status','Tarikh dan masa'],...filteredRecords().map(x=>[x.name,x.klass,x.score,x.correct,x.wrong,x.lives,x.status,new Date(x.completedAt).toLocaleString('ms-MY')])];const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='rekod_RBT_Pirate_Treasure_Hunt.csv';a.click();URL.revokeObjectURL(url)});
+$('printBtn').addEventListener('click',()=>window.print());
+$('deleteBtn').addEventListener('click',()=>{const pin=prompt('Sahkan dengan PIN guru untuk memadam semua rekod:');if(pin!==TEACHER_PIN){if(pin!==null)alert('PIN tidak betul. Rekod tidak dipadam.');return}if(confirm('Anda pasti mahu memadam SEMUA rekod pada peranti ini? Tindakan ini tidak boleh dibatalkan.')){localStorage.removeItem(STORAGE_KEY);renderDashboard();alert('Semua rekod setempat telah dipadam.')}});
+$('changePinBtn').addEventListener('click',()=>{alert('Untuk menukar PIN, edit nilai TEACHER_PIN di bahagian atas kod HTML, kemudian simpan fail. PIN lalai semasa: '+TEACHER_PIN)});
+</script>
+</body>
+</html>
